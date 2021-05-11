@@ -2,12 +2,14 @@ package com.Api.Basica.demo.controller;
 
 import java.net.URI;
 import java.util.List;
+import java.util.Optional;
 
 import javax.transaction.Transactional;
 import javax.validation.Valid;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
+import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
@@ -57,20 +59,44 @@ public class TopicoController {
 	
 	@GetMapping("/{id}")
 	public ResponseEntity<DetalhesTopicoDto> detalhar(@PathVariable Long id) {
-		Topico topico = topicoRepository.getOne(id);
+		Optional<Topico> topico = topicoRepository.findById(id);
 		
-		DetalhesTopicoDto detalhe = new DetalhesTopicoDto(topico);
-		
-		
-		return  ResponseEntity.ok(detalhe) ;
+		if(topico.isPresent()) {
+			DetalhesTopicoDto detalhe = new DetalhesTopicoDto(topico.get());
+			
+			return  ResponseEntity.ok(detalhe);
+			
+		}
+
+		return ResponseEntity.notFound().build();
 	}
 	
 	@PutMapping("/{id}")
 	@Transactional //Seta no banco de dados apenas setando o novo topico
 	public ResponseEntity<TopicoDto> atualizaTopico(@PathVariable Long id, @RequestBody @Valid AtualizacaoTopicoForm form){
-		Topico topico = form.atualizar(id,topicoRepository);
+		Optional<Topico> topico = topicoRepository.findById(id);
 		
-		return ResponseEntity.ok(new TopicoDto(topico));
+		if(topico.isPresent()) {
+		Topico topicoReal = form.atualizar(id,topicoRepository);
+		
+		return ResponseEntity.ok(new TopicoDto(topicoReal));
+		}
+		
+		return ResponseEntity.notFound().build();
+	}
+	
+	@DeleteMapping("/{id}")
+	public ResponseEntity<?> deletaTopico(@PathVariable Long id){
+		Optional<Topico> topico = topicoRepository.findById(id);
+		
+		if(topico.isPresent()) {
+		
+			topicoRepository.deleteById(id);
+		
+			return ResponseEntity.ok().build();
+		}
+		
+		return ResponseEntity.notFound().build();
 	}
 	
 }
