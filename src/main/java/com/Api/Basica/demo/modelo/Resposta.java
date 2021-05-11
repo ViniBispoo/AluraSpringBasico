@@ -8,6 +8,8 @@ import javax.persistence.GenerationType;
 import javax.persistence.Id;
 import javax.persistence.ManyToOne;
 
+import com.Api.Basica.demo.controller.form.RespostaForm;
+
 @Entity
 public class Resposta {
 	
@@ -21,6 +23,19 @@ public class Resposta {
     @ManyToOne
     private Usuario autor;
     private Boolean solucao = false;
+    
+    public Resposta() {
+    	
+    }
+    
+    public Resposta(String mensagem, Topico topico) {
+    	this.mensagem= mensagem;
+    	this.topico = topico;
+    	//gambiarra pra você arrumar dps
+    	this.autor = topico.getAutor();
+    }
+    
+
 
 	@Override
 	public int hashCode() {
