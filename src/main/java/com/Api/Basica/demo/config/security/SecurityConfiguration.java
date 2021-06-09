@@ -14,6 +14,8 @@ import org.springframework.security.config.http.SessionCreationPolicy;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.security.web.authentication.UsernamePasswordAuthenticationFilter;
 
+import com.Api.Basica.demo.repository.UsuarioRepository;
+
 @EnableWebSecurity
 @Configuration// quando inicia o projeto o spring le essas configurações antes
 public class SecurityConfiguration extends WebSecurityConfigurerAdapter{
@@ -23,6 +25,9 @@ public class SecurityConfiguration extends WebSecurityConfigurerAdapter{
 	
 	@Autowired
 	private TokenService tokenService;
+	
+	@Autowired
+	private UsuarioRepository usuarioRepository;
 	
 	@Override
 	@Bean
@@ -46,7 +51,7 @@ public class SecurityConfiguration extends WebSecurityConfigurerAdapter{
 		.anyRequest().authenticated() //todas as outras devem ser autenticadas
 		.and().csrf().disable()
 		.sessionManagement().sessionCreationPolicy(SessionCreationPolicy.STATELESS)//não vai mais ser autenticação por session
-		.and().addFilterBefore(new AutenticacaoViaTokenFielder(tokenService),UsernamePasswordAuthenticationFilter.class   );
+		.and().addFilterBefore(new AutenticacaoViaTokenFielder(tokenService, usuarioRepository),UsernamePasswordAuthenticationFilter.class   );
 	}
 	
 	//configuração de recursos estaticos(js, css, ...)
